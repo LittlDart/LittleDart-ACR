@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <!-- AE 宿主跑在 Windows 上，且依赖 Dalamud / FFXIVClientStructs -->
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <!-- 必须与 AE 的 ACR 文件夹同名，否则加载不了 -->
+    <AssemblyName>LittleDart</AssemblyName>
+    <!-- AE 侧通过 unsafe 指针访问游戏内存 -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- ACR 的依赖由 AE 宿主进程提供，不要复制到产物目录 -->
+    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- 产物直接落在 bin\<配置>\，不带 TFM 子目录 -->
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <DebugType>portable</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- 官方模板的警告忽略清单；ACR 里有些约定俗成的写法会让编译器唠叨 -->
+    <NoWarn>CS1998;1701;1702;CS0414;CS8601;CS8602;CS8604;CS8603;IDE1006;IDE0300;MSB3270;MSB324;CS0649;CA2211;CS8509;CS8625;MSB3305;CS8618;CS8600;CS8605;CS8620;CS0436;CS0169;CS0105;CS1591</NoWarn>
+    <!-- async 方法忘了 await 当错误处理 -->
+    <WarningsAsErrors>CS4014</WarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 编译时间戳：运行时用于日志里的 <Build …> -->
+    <AssemblyMetadata Include="BuildStamp" Value="$([System.DateTime]::Now.ToString('MM-dd HH:mm:ss'))" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 热键图标；必须随 dll 一起放进 ACR 目录的 Resources\ -->
+    <None Include="Resources\**\*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 唯一依赖：AEAssist.NET（官方 MyGet 源，版本钉死以便离线还原） -->
+    <PackageReference Include="AEAssist.NET" Version="1.2.16" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+</Project>
